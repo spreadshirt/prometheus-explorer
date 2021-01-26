@@ -239,6 +239,11 @@ shortcuts:
 				}
 			}
 
+			if (config.y_max) {
+				myChart.options.scales.yAxes[0].ticks.max = config.y_max;
+			} else {
+				delete myChart.options.scales.yAxes[0].ticks.max;
+			}
 			myChart.data.datasets = [];
 
 			let u = new URL(`http://${global.defaults.source}/api/v1/query_range`);
