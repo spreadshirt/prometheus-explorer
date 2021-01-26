@@ -1,0 +1,17 @@
+defaults:
+  source: localhost:9090
+  from: "2021-01-25T00:00:00Z"
+  to: "2021-01-26T00:00:00Z"
+  step: 1m
+  max_series: 10
+variables:
+  cluster: "eu"
+  instance: "localhost"
+
+up:
+  query: up
+  label: job
+
+shortcuts:
+  - regexp: "cpu of (.*)"
+    query: rate(container_cpu_usage_seconds_total{cluster=~"${vars.cluster}.*", pod=~"${match[1]}.*", image!="", container!="POD"}[5m])

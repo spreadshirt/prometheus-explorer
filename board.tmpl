@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>{{ .Title }} - prometheus-explorer</title>
+
+	<link href="/static/deps/Chart.min.css" type="stylesheet">
+
+	<script defer src="/static/deps/Chart.bundle.min.js"></script>
+	<!-- from http://davidbau.com/archives/2010/01/30/random_seeds_coded_hints_and_quintillions.html -->
+	<script defer src="/static/deps/seedrandom.min.js"></script>
+	<script defer src="/static/deps/js-yaml.min.js"></script>
+	<script defer src="/static/board.js"></script>
+
+
+	<style>
+	#global {
+		position: fixed;
+		bottom: 0;
+		right: 0;
+	}
+
+	article h1 {
+		font-size: larger;
+		font-family: monospace;
+	}
+
+	article.chart {
+		position: relative;
+		max-width: 50vh;
+		max-height: 40vh;
+		float: left;
+		margin-right: 1em;
+		margin-bottom: 1em;
+	}
+
+	.chart input {
+		max-width: 45vh;
+	}
+
+	.chart canvas {
+		margin-top: 1ex;
+	}
+
+	.query, .duration, .error { font-family: monospace; }
+
+	.error { color: red; }
+	</style>
+</head>
+
+<body>
+	<form>
+		<div>
+			<textarea id="config" cols="80" rows="20">{{ .Config }}</textarea>
+		</div>
+	</form>
+
+	<div id="global">
+		<pre id="help">chart!
+
+shortcuts:
+
+  cpu of $service            - shortcut for cpu metrics of service' pods
+  cpu throttling of $service - shortcut for cpu throttling metrics of service' pods
+  memory of $service         - shortcut for memory usage of service' pods
+</pre>
+
+		<pre id="error" class="error"></pre>
+	</div>
+
+	<div id="charts"></div>
+</body>
+</html>
