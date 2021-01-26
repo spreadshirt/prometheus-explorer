@@ -167,10 +167,12 @@ function createChart(name, config, global) {
     }
     myChart.data.datasets = [];
 
+    let toDateString = (d) => d instanceof Date ? d.toISOString() : d;
+
     let u = new URL(`http://${global.defaults.source}/api/v1/query_range`);
     u.searchParams.set("query", config.query);
-    u.searchParams.set("start", global.defaults.from || global.defaults.from);
-    u.searchParams.set("end", config.to || global.defaults.to);
+    u.searchParams.set("start", toDateString(config.from || global.defaults.from));
+    u.searchParams.set("end", toDateString(config.to || global.defaults.to));
     u.searchParams.set("step", config.step || global.defaults.step);
     let request = new Request(u.toString());
 
