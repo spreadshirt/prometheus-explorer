@@ -149,7 +149,6 @@ function createChart(name, config, global) {
     for (let shortcut of global.shortcuts) {
       let match = config.query.match(shortcut.regexp);
       if (match) {
-        console.log(match);
         let vars = global.variables;
         config.query = eval("`"+shortcut.query+"`");
         generatedQueryEl.style.display = "block";

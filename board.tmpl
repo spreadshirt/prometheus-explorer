@@ -13,13 +13,34 @@
 	<script defer src="/static/deps/seedrandom.min.js"></script>
 	<script defer src="/static/deps/js-yaml.min.js"></script>
 	<script defer src="/static/board.js"></script>
-
+	<script defer src="/static/explore.js"></script>
 
 	<style>
 	#global {
 		position: fixed;
 		bottom: 0;
 		right: 0;
+	}
+
+	#search {
+		position: absolute;
+		top: 0;
+		right: 0;
+		z-index: 1;
+	}
+
+	#search pre {
+		overflow-wrap: break-word;
+		white-space: pre-line;
+		max-width: 40em;
+		max-height: 50vh;
+		overflow: scroll;
+		background-color: white;
+		padding: 1ex;
+	}
+
+	#search pre .name {
+		font-weight: bold;
 	}
 
 	article h1 {
@@ -51,6 +72,14 @@
 </head>
 
 <body>
+	<form id="search">
+		<input type="search" placeholder="Search for metrics..." size="40" list="metric-names">
+		<datalist id="metric-names"></datalist>
+		<span class="duration"></span>
+		<span class="error"></span>
+		<pre></pre>
+	</form>
+
 	<form>
 		<div>
 			<textarea id="config" cols="80" rows="20">{{ .Config }}</textarea>
