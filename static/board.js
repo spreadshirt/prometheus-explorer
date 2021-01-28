@@ -7,6 +7,72 @@ let configEl = document.getElementById("config");
 let config = {};
 let charts = {};
 
+let crosshairCharts = [];
+let crosshairChartsImages = [];
+let crosshairEvent = null;
+let crosshairEventChart = null;
+let crosshairPlugin = {
+  beforeInit: function(chart) {
+    crosshairCharts.push(chart);
+    crosshairChartsImages.push(null);
+  },
+  beforeEvent: function(chart, ev) {
+    if (ev.type != "mousemove" && ev.type != "mouseout") {
+      return;
+    }
+    crosshairEvent = ev;
+    crosshairEventChart = chart;
+  },
+  afterDatasetsDraw: function(chart) {
+    if (!crosshairEvent) {
+      return;
+    }
+
+    if (crosshairEvent.type == "mouseout") {
+      for (let i = 0; i < crosshairCharts.length; i++) {
+        if (crosshairChartsImages[i] != null) {
+          crosshairCharts[i].ctx.putImageData(crosshairChartsImages[i], 0, 0);
+        }
+      }
+      return;
+    }
+
+    for (let i = 0; i < crosshairCharts.length; i++) {
+      let chart = crosshairCharts[i];
+
+      let x = crosshairEvent.x;
+      if (chart.id != crosshairEventChart.id) {
+        if (crosshairChartsImages[i] == null) {
+          crosshairChartsImages[i] = chart.ctx.getImageData(0, 0, chart.ctx.canvas.width, chart.ctx.canvas.height);
+        }
+        chart.ctx.putImageData(crosshairChartsImages[i], 0, 0);
+
+        x = (crosshairEvent.x / crosshairEventChart.width) * chart.width;
+      }
+
+      chart.ctx.save()
+      chart.ctx.lineWidth = "0.5px";
+      chart.ctx.strokeStyle = "black";
+      chart.ctx.imageSmoothingEnabled = false;
+      let path = new Path2D();
+      path.moveTo(x, chart.chartArea.top);
+      path.lineTo(x, chart.chartArea.bottom);
+      chart.ctx.stroke(path);
+      chart.ctx.restore();
+    }
+
+    crosshairEvent = null;
+    crosshairEventChart = null;
+  },
+  afterDraw: function(chart) {
+    for (let i = 0; i < crosshairCharts.length; i++) {
+      if (chart.id == crosshairCharts[i].id) {
+        crosshairChartsImages[i] = null;
+      }
+    }
+  },
+};
+
 update();
 configEl.addEventListener("change", update);
 configEl.addEventListener("keydown", (ev) => {
@@ -129,7 +195,8 @@ function createChart(name, config, global) {
         animationDuration: 0,
       },
       responsiveAnimationDuration: 0,
-    }
+    },
+    plugins: [crosshairPlugin],
   });
 
   let chart = {
