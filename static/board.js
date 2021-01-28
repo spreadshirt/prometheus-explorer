@@ -319,7 +319,7 @@ function formatUnit(value, unit) {
   if (value > 1_000) {
     return prefix*round2(value / 1_000) + "K";
   }
-  return prefix*value;
+  return prefix*round2(value);
 }
 
 function round2(value) {
