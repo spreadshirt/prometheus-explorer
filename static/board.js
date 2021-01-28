@@ -183,6 +183,7 @@ function createChart(name, config, global) {
           },
         },
       },
+      // performance optimizations (mostly no animations)
       elements: {
         line: {
           tension: 0,
