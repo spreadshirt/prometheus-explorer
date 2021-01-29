@@ -330,7 +330,8 @@ function createChart(name, config, global) {
     let to = toDate(config.to || global.defaults.to);
     u.searchParams.set("start", toDateString(from));
     u.searchParams.set("end", toDateString(to));
-    let autoStep = ctx.canvas.width / 2; //Math.round((to - from) / 1000 / 200);
+    // step size in seconds chosen to yield 200 steps per chart
+    let autoStep = Math.round((to - from) / 1000 / 200);
     u.searchParams.set("step", config.step || global.defaults.step || autoStep);
     let request = new Request(u.toString());
 
