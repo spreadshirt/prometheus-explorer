@@ -66,6 +66,13 @@ let crosshairPlugin = {
     crosshairEvent = null;
     crosshairEventChart = null;
   },
+  beforeUpdate: function(chart) {
+    for (let i = 0; i < crosshairCharts.length; i++) {
+      if (chart.id == crosshairCharts[i].id) {
+        crosshairChartsImages[i] = null;
+      }
+    }
+  },
   afterDraw: function(chart) {
     for (let i = 0; i < crosshairCharts.length; i++) {
       if (chart.id == crosshairCharts[i].id) {
