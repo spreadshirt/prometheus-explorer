@@ -275,6 +275,9 @@ function createChart(name, config, global) {
             label = metric.metric[config.label] || config.label;
           }
           Math.seedrandom(JSON.stringify(metric.metric));
+          if (Object.keys(metric.metric).length == 0) {
+            Math.seedrandom(config.query);
+          }
           let color = Math.floor(Math.random()*360);
           myChart.data.datasets.push({
             label: label,
