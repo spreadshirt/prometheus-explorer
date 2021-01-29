@@ -141,6 +141,16 @@ function createChart(name, config, global) {
       scales: {
         xAxes: [{
           type: "time",
+          time: {
+            displayFormats: {
+              second: "HH:mm:ss",
+              minute: "HH:mm",
+              hour: "HH:00",
+              day: "YYYY-MM-DD",
+              week: "YYYY-MM-DD",
+              month: "YYYY-MM",
+            },
+          },
         }],
         yAxes: [{
           ticks: {
