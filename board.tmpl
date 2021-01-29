@@ -69,6 +69,11 @@
 	.query, .duration, .error { font-family: monospace; }
 
 	.error { color: red; }
+
+	textarea {
+		width: 80%;
+		min-height: 20em;
+	}
 	</style>
 </head>
 
@@ -82,9 +87,10 @@
 	</form>
 
 	<form>
-		<div>
-			<textarea id="config" cols="80" rows="20">{{ .Config }}</textarea>
-		</div>
+		<details open>
+			<summary>config</summary>
+			<textarea id="config">{{ .Config }}</textarea>
+		</details>
 	</form>
 
 	<div id="global">
@@ -101,5 +107,10 @@ shortcuts:
 	</div>
 
 	<div id="charts"></div>
+
+	<details>
+		<summary>shortcuts</summary>
+		<textarea id="shortcuts">{{ .Shortcuts }}</textarea>
+	</details>
 </body>
 </html>

@@ -5,6 +5,8 @@ window.onerror = (msg, url, line) => {
 
 let configEl = document.getElementById("config");
 let config = {};
+let shortcutsEl = document.getElementById("shortcuts");
+let chartsEl = document.getElementById("charts");
 let charts = {};
 
 let crosshairCharts = [];
@@ -87,8 +89,14 @@ configEl.addEventListener("keydown", (ev) => {
 function update() {
   config = jsyaml.load(configEl.value);
 
+  config.shortcuts = config.shortcuts || [];
+  let shortcuts = jsyaml.load(shortcutsEl.value);
+  for (let shortcut of shortcuts.shortcuts) {
+    config.shortcuts.push(shortcut);
+  }
+
   for (let key in config) {
-    if (key == "defaults" || key == "variables" || key == "shortcuts") {
+    if (key == "defaults" || key == "annotations" || key == "variables" || key == "shortcuts") {
       continue;
     }
 

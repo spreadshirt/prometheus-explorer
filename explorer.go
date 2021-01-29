@@ -53,9 +53,16 @@ func renderBoard(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	shortcutsData, err := ioutil.ReadFile(path.Join("boards", "shortcuts.yml"))
+	if err != nil {
+		log.Printf("opening shortcuts %q: %s", name, err)
+		shortcutsData = []byte{}
+	}
+
 	boardTmpl.Execute(w, map[string]interface{}{
-		"Title":  name,
-		"Config": string(data),
+		"Title":     name,
+		"Config":    string(data),
+		"Shortcuts": string(shortcutsData),
 	})
 }
 
