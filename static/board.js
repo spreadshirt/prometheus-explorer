@@ -59,6 +59,7 @@ let crosshairPlugin = {
         }
         chart.ctx.putImageData(crosshairChartsImages[i], 0, 0);
 
+        // FIXME: fix shared crosshair position (incorrect if width is different)
         x = (crosshairEvent.x / crosshairEventChart.width) * chart.width;
       }
 
