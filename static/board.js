@@ -284,7 +284,15 @@ function createChart(name, config, global) {
     }
     myChart.data.datasets = [];
 
-    let toDateString = (d) => d instanceof Date ? d.toISOString() : d;
+    let toDateString = (d) => {
+      if (d instanceof Date) {
+        return d.toISOString();
+      }
+      if (d == "now") {
+        return new Date().toISOString();
+      }
+      return d;
+    }
 
     let u = new URL(`http://${global.defaults.source}/api/v1/query_range`);
     u.searchParams.set("query", config.query);
