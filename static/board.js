@@ -160,6 +160,7 @@ function createChart(name, config, global) {
         xAxes: [{
           type: "time",
           time: {
+            // TODO: always display timestamps in utc
             displayFormats: {
               second: "HH:mm:ss",
               minute: "HH:mm",
@@ -168,6 +169,11 @@ function createChart(name, config, global) {
               week: "YYYY-MM-DD",
               month: "YYYY-MM",
             },
+          },
+          // FIXME: fix chart range to always be from...to (right now it only uses the datapoints from the dataset for min/max)
+          ticks: {
+            min: new Date(config.from || global.defaults.from),
+            max: new Date(config.to || global.defaults.to),
           },
         }],
         yAxes: [{
