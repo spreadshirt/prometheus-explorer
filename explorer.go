@@ -49,8 +49,13 @@ func renderBoard(w http.ResponseWriter, req *http.Request) {
 	data, err := ioutil.ReadFile(path.Join("boards", name+".yml"))
 	if err != nil {
 		log.Printf("opening board %q: %s", name, err)
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
+
+		data, err = ioutil.ReadFile(path.Join("boards", "default.yml"))
+		if err != nil {
+			log.Printf("opening board %q: %s", name, err)
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
 	}
 
 	shortcutsData, err := ioutil.ReadFile(path.Join("boards", "shortcuts.yml"))
