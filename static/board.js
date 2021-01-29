@@ -148,6 +148,16 @@ function createChart(name, config, global) {
 
   chartsEl.appendChild(chartEl);
 
+  let toDate = (d) => {
+    if (d instanceof Date) {
+      return d;
+    }
+    if (d == "now") {
+      return new Date();
+    }
+    return new Date(d);
+  }
+
   let numLabels = 0;
   var ctx = canvasEl.getContext("2d");
   var myChart = new Chart(ctx, {
@@ -170,10 +180,9 @@ function createChart(name, config, global) {
               month: "YYYY-MM",
             },
           },
-          // FIXME: fix chart range to always be from...to (right now it only uses the datapoints from the dataset for min/max)
           ticks: {
-            min: new Date(config.from || global.defaults.from),
-            max: new Date(config.to || global.defaults.to),
+            min: toDate(config.from || global.defaults.from),
+            max: toDate(config.to || global.defaults.to),
           },
         }],
         yAxes: [{
