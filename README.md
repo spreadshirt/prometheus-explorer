@@ -1,7 +1,7 @@
 # prometheus-explorer
 
 Interactively explore metrics, create shortcuts for common metrics and
-reference existing visualizations interactively.
+reference existing visualizations.
 
 This is not intended to replace Grafana or Prometheus' graph explorer,
 but to exist between them, for on-the-fly exploration and referencing of
