@@ -326,9 +326,12 @@ function createChart(name, config, global) {
 
     let u = new URL(`http://${global.defaults.source}/api/v1/query_range`);
     u.searchParams.set("query", config.query);
-    u.searchParams.set("start", toDateString(config.from || global.defaults.from));
-    u.searchParams.set("end", toDateString(config.to || global.defaults.to));
-    u.searchParams.set("step", config.step || global.defaults.step);
+    let from = toDate(config.from || global.defaults.from);
+    let to = toDate(config.to || global.defaults.to);
+    u.searchParams.set("start", toDateString(from));
+    u.searchParams.set("end", toDateString(to));
+    let autoStep = ctx.canvas.width / 2; //Math.round((to - from) / 1000 / 200);
+    u.searchParams.set("step", config.step || global.defaults.step || autoStep);
     let request = new Request(u.toString());
 
     let start = new Date();
