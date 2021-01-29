@@ -115,6 +115,7 @@ function update() {
   }
 }
 
+// TODO: support refreshing automatically
 /*window.setInterval(function() {
     for (chart of charts) {
       chart.render();
