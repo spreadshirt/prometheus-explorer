@@ -273,7 +273,7 @@ function createChart(name, config, global) {
         generatedQueryEl.value = config.query;
         generatedQueryEl.size = config.query.length;
         config.unit = shortcut.unit;
-        config.label = shortcut.label;
+        config.label = eval("`"+shortcut.label+"`");
       }
     }
 
