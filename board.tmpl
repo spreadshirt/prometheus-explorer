@@ -44,18 +44,30 @@
 		font-weight: bold;
 	}
 
-	article h1 {
-		font-size: larger;
+	#charts {
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	.chart {
+		flex-grow: 1;
+
+		max-width: 50vh;
+
+		margin-right: 1em;
+		margin-bottom: 1em;
+	}
+
+	h1 {
 		font-family: monospace;
 	}
 
-	article.chart {
+	.chart h1 {
+		font-size: larger;
+	}
+
+	.chart .chart-container {
 		position: relative;
-		max-width: 50vh;
-		max-height: 40vh;
-		float: left;
-		margin-right: 1em;
-		margin-bottom: 1em;
 	}
 
 	.chart input {
@@ -78,6 +90,7 @@
 </head>
 
 <body>
+	<h1>{{ .Title }}</h1>
 	<form id="search">
 		<input type="search" placeholder="Search for metrics..." size="40" list="metric-names">
 		<datalist id="metric-names"></datalist>

@@ -123,7 +123,10 @@ function createChart(name, config, global) {
   let canvasEl = document.createElement("canvas");
   canvasEl.width = 800;
   canvasEl.height = 400;
-  chartEl.appendChild(canvasEl);
+  let containerEl = document.createElement("div");
+  containerEl.classList.add("chart-container");
+  containerEl.appendChild(canvasEl);
+  chartEl.appendChild(containerEl);
   let durEl = document.createElement("span");
   durEl.classList.add("duration");
   chartEl.appendChild(durEl);
@@ -136,7 +139,7 @@ function createChart(name, config, global) {
   generatedQueryEl.disabled = "disabled";
   chartEl.appendChild(generatedQueryEl);
 
-  document.body.appendChild(chartEl);
+  chartsEl.appendChild(chartEl);
 
   let numLabels = 0;
   var ctx = canvasEl.getContext("2d");
