@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"sync"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -34,10 +35,8 @@ func main() {
 	r.HandleFunc("/{name}", renderBoard).Methods("GET")
 	r.HandleFunc("/", renderBoard).Methods("GET")
 
-	http.Handle("/", r)
-
 	log.Printf("Listening on http://%s", config.Addr)
-	log.Fatal(http.ListenAndServe(config.Addr, nil))
+	log.Fatal(http.ListenAndServe(config.Addr, handlers.CompressHandler(r)))
 }
 
 func renderBoard(w http.ResponseWriter, req *http.Request) {
