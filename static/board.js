@@ -18,6 +18,16 @@ let crosshairPlugin = {
     crosshairCharts.push(chart);
     crosshairChartsImages.push(null);
   },
+  destroy: function(chart) {
+    let i = 0;
+    for (i = 0; i < crosshairCharts.length; i++) {
+      if (chart.id == crosshairCharts[i].id) {
+        break;
+      }
+    }
+    crosshairCharts.splice(i, 1);
+    crosshairChartsImages.splice(i, 1);
+  },
   beforeEvent: function(chart, ev) {
     if (ev.type != "mousemove" && ev.type != "mouseout") {
       return;
@@ -111,6 +121,14 @@ function update() {
       createChart(key, config[key], config);
     } else {
       charts[key].render(key, config[key], config);
+    }
+  }
+
+  for (let name in charts) {
+    if (!(name in config)) {
+      charts[name].chart.destroy();
+      chartsEl.removeChild(charts[name].element);
+      delete charts[name];
     }
   }
 }
@@ -263,6 +281,7 @@ function createChart(name, config, global) {
   let chart = {
     config: config,
     chart: myChart,
+    element: chartEl,
     render: (name, config, global) => render(name, config, global),
   };
   config.name = name;
