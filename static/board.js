@@ -193,6 +193,22 @@ function createChart(name, config, global) {
           },
         },
       },
+      // plugin configuration
+      annotation: {
+        annotations: [/*{
+          type: "line",
+          scaleID: "x-axis-0",
+          mode: "vertical",
+          borderColor: "black",
+          borderWidth: 1,
+          value: new Date(),
+          label: {
+            enabled: false,
+            content: "Test annotation",
+            position: "bottom",
+          },
+        }*/],
+      },
       // performance optimizations (mostly no animations)
       elements: {
         line: {
