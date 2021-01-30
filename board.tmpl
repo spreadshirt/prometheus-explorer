@@ -112,9 +112,12 @@
 
 	<div id="charts"></div>
 
+	{{ if (ne .Title "shortcuts") }}
 	<details>
 		<summary>shortcuts</summary>
-		<textarea id="shortcuts">{{ .Shortcuts }}</textarea>
+		<textarea id="shortcuts" disabled>{{ .Shortcuts }}</textarea>
+		<p>Go to <a href="/shortcuts">/shortcuts</a> to change the global shortcuts.</p>
 	</details>
+	{{ end }}
 </body>
 </html>
