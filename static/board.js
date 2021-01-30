@@ -67,10 +67,11 @@ let crosshairPlugin = {
       x = Math.min(x, chart.chartArea.right);
       x = Math.max(x, chart.chartArea.left);
 
+      // avoid anti-aliasing blur (wtf)
+      x = Chart.helpers._alignPixel(chart, x, chart.width);
+
       chart.ctx.save()
-      chart.ctx.lineWidth = "0.5px";
       chart.ctx.strokeStyle = "black";
-      chart.ctx.imageSmoothingEnabled = false;
       let path = new Path2D();
       path.moveTo(x, chart.chartArea.top);
       path.lineTo(x, chart.chartArea.bottom);
