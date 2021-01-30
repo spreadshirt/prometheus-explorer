@@ -92,13 +92,17 @@
 </head>
 
 <body>
-	<form id="search">
-		<input type="search" placeholder="Search for metrics..." size="40" list="metric-names">
-		<datalist id="metric-names"></datalist>
-		<span class="duration"></span>
-		<span class="error"></span>
-		<pre></pre>
-	</form>
+	<nav>
+		<form id="search">
+			<input type="search" placeholder="Search for metrics, e.g. node_" size="40" list="metric-names">
+			<datalist id="metric-names"></datalist>
+			<span class="duration"></span>
+			<span class="error"></span>
+			<pre></pre>
+		</form>
+
+		<a href="https://prometheus.io/docs/prometheus/latest/querying/basics/">Prometheus Docs</a>
+	</nav>
 
 	<h1>{{ .Title }}</h1>
 

@@ -6,11 +6,15 @@ let durEl = searchFormEl.querySelector(".duration");
 let errEl = searchFormEl.querySelector(".error");
 
 searchEl.onblur = (ev) => {
-  console.log(ev);
   resultsEl.style.display = "none";
 }
 
 searchEl.onkeydown = (ev) => {
+  if (ev.key == "Escape") {
+    searchEl.blur();
+    return;
+  }
+
   if (ev.key == "Enter") {
     ev.preventDefault();
 
