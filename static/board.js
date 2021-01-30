@@ -59,9 +59,13 @@ let crosshairPlugin = {
         }
         chart.ctx.putImageData(crosshairChartsImages[i], 0, 0);
 
-        // FIXME: fix shared crosshair position (incorrect if width is different)
-        x = (crosshairEvent.x / crosshairEventChart.width) * chart.width;
+        let origLeft = crosshairEventChart.chartArea.left;
+        x = chart.chartArea.left + ((crosshairEvent.x - origLeft) / (crosshairEventChart.width - origLeft)) * (chart.width - chart.chartArea.left);
       }
+
+      // ensure crosshair does not go out of chart range
+      x = Math.min(x, chart.chartArea.right);
+      x = Math.max(x, chart.chartArea.left);
 
       chart.ctx.save()
       chart.ctx.lineWidth = "0.5px";
