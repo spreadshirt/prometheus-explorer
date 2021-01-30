@@ -45,11 +45,14 @@ func renderBoard(w http.ResponseWriter, req *http.Request) {
 		name = "default"
 	}
 
+	isNew := false
+
 	// FIXME: restrict paths to only boards/
 	data, err := ioutil.ReadFile(path.Join("boards", name+".yml"))
 	if err != nil {
 		log.Printf("opening board %q: %s", name, err)
 
+		isNew = true
 		data, err = ioutil.ReadFile(path.Join("boards", "default.yml"))
 		if err != nil {
 			log.Printf("opening board %q: %s", name, err)
@@ -66,6 +69,7 @@ func renderBoard(w http.ResponseWriter, req *http.Request) {
 
 	boardTmpl.Execute(w, map[string]interface{}{
 		"Title":     name,
+		"IsNew":     isNew,
 		"Config":    string(data),
 		"Shortcuts": string(shortcutsData),
 	})

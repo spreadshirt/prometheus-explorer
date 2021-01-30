@@ -103,7 +103,7 @@
 	<h1>{{ .Title }}</h1>
 
 	<form>
-		<details open>
+		<details {{ if (or (eq .Title "default") .IsNew) }}open{{ end }}>
 			<summary>config</summary>
 			<textarea id="config">{{ .Config }}</textarea>
 		</details>
