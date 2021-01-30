@@ -102,10 +102,13 @@
 
 	<h1>{{ .Title }}</h1>
 
-	<form>
+	<form action="/{{ .Title }}" method="POST">
 		<details {{ if (or (eq .Title "default") .IsNew) }}open{{ end }}>
 			<summary>config</summary>
-			<textarea id="config">{{ .Config }}</textarea>
+			<textarea id="config" name="config">{{ .Config }}</textarea>
+			<div>
+				<input type="submit" value="save" />
+			</div>
 		</details>
 	</form>
 

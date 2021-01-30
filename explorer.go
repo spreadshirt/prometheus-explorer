@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"path"
 	"regexp"
+	"strings"
 	"sync"
 
 	"github.com/gorilla/handlers"
@@ -33,6 +34,7 @@ func main() {
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	r.HandleFunc("/names", handleNameAutocomplete).Methods("GET")
 	r.HandleFunc("/{name}", renderBoard).Methods("GET")
+	r.HandleFunc("/{name}", saveBoard).Methods("POST")
 	r.HandleFunc("/", renderBoard).Methods("GET")
 
 	log.Printf("Listening on http://%s", config.Addr)
@@ -73,6 +75,30 @@ func renderBoard(w http.ResponseWriter, req *http.Request) {
 		"Config":    string(data),
 		"Shortcuts": string(shortcutsData),
 	})
+}
+
+func saveBoard(w http.ResponseWriter, req *http.Request) {
+	boardName := mux.Vars(req)["name"]
+
+	boardConfig := req.FormValue("config")
+
+	if strings.TrimSpace(boardConfig) == "" {
+		http.Error(w, "empty board config", http.StatusBadRequest)
+		return
+	}
+
+	err := ioutil.WriteFile(path.Join("boards", boardName+".yml"), []byte(strings.ReplaceAll(boardConfig, "\r\n", "\n")), 0644)
+	if err != nil {
+		log.Printf("could not save board: %s", err)
+		http.Error(w, "error saving board", http.StatusInternalServerError)
+		return
+	}
+
+	redirect := req.URL.Path
+	if boardName == "default" {
+		redirect = "/"
+	}
+	http.Redirect(w, req, redirect, http.StatusSeeOther)
 }
 
 var namesCacheMu sync.Mutex
