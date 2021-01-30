@@ -24,20 +24,22 @@
 	}
 
 	#search {
-		position: absolute;
-		top: 0;
-		right: 0;
 		z-index: 1;
 	}
 
 	#search pre {
+		position: fixed;
 		overflow-wrap: break-word;
 		white-space: pre-line;
-		max-width: 40em;
-		max-height: 50vh;
-		overflow: scroll;
+		width: 80%;
+		max-height: 50%;
+		overflow-y: scroll;
 		background-color: white;
 		padding: 1ex;
+		border: 1px black solid;
+		z-index: 1;
+
+		display: none;
 	}
 
 	#search pre .name {
@@ -90,7 +92,6 @@
 </head>
 
 <body>
-	<h1>{{ .Title }}</h1>
 	<form id="search">
 		<input type="search" placeholder="Search for metrics..." size="40" list="metric-names">
 		<datalist id="metric-names"></datalist>
@@ -98,6 +99,8 @@
 		<span class="error"></span>
 		<pre></pre>
 	</form>
+
+	<h1>{{ .Title }}</h1>
 
 	<form>
 		<details open>

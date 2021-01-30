@@ -5,12 +5,18 @@ let resultsEl = searchFormEl.querySelector("pre");
 let durEl = searchFormEl.querySelector(".duration");
 let errEl = searchFormEl.querySelector(".error");
 
+searchEl.onblur = (ev) => {
+  console.log(ev);
+  resultsEl.style.display = "none";
+}
+
 searchEl.onkeydown = (ev) => {
   if (ev.key == "Enter") {
     ev.preventDefault();
 
     if (searchEl.value == "") {
       resultsEl.innerHTML = "";
+      resultsEl.style.display = "none";
       return;
     }
 
@@ -59,10 +65,13 @@ function listSeries() {
         resultEl.appendChild(tagsEl);
         resultEl.appendChild(document.createTextNode("\n"));
         resultsEl.appendChild(resultEl);
+
+        resultsEl.style.display = "inherit";
       }
 
       if (resp.data.length == 0) {
         errEl.textContent = "no results";
+        resultsEl.style.display = "none";
       }
     })
     .catch(err => {
@@ -92,9 +101,11 @@ function fetchMetricNames() {
         resultEl.textContent = name + "\n";
         resultsEl.appendChild(resultEl);
       }
+      resultsEl.style.display = "inherit";
 
       if (resp.data.length == 0) {
         errEl.textContent = "no results";
+        resultsEl.style.display = "none";
       }
     })
     .catch(err => {
