@@ -324,6 +324,9 @@ function createChart(name, config, global) {
       return d;
     }
 
+    myChart.options.scales.xAxes[0].ticks.min = toDate(config.from || global.defaults.from);
+    myChart.options.scales.xAxes[0].ticks.max = toDate(config.to || global.defaults.to);
+
     let u = new URL(`http://${global.defaults.source}/api/v1/query_range`);
     u.searchParams.set("query", config.query);
     let from = toDate(config.from || global.defaults.from);
