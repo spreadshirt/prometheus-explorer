@@ -1,7 +1,7 @@
 defaults:
   source: localhost:9090
-  from: "2021-01-25T00:00:00Z"
-  to: "2021-01-26T00:00:00Z"
+  from: "2021-01-30T14:00:00Z"
+  to: now #"2021-01-26T00:00:00Z"
   step: 1m
   max_series: 10
 variables:
@@ -11,6 +11,11 @@ variables:
 up:
   query: up
   label: job
+
+network:
+  query: rate(node_network_receive_bytes_total{device="wlp3s0"}[5m])
+  unit: bytes
+  label: device
 
 shortcuts:
   - regexp: "cpu of (.*)"
