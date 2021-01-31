@@ -339,7 +339,7 @@ function createChart(name, config, global) {
     u.searchParams.set("start", toDateString(from));
     u.searchParams.set("end", toDateString(to));
     // step size in seconds chosen to yield 200 steps per chart
-    let autoStep = Math.min(1, Math.round((to - from) / 1000 / 200));
+    let autoStep = Math.max(1, Math.round((to - from) / 1000 / 200));
     let step = config.step || global.defaults.step || autoStep;
     u.searchParams.set("step", step);
     let request = new Request(u.toString());
