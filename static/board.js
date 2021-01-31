@@ -173,12 +173,36 @@ function createChart(name, config, global) {
 
   chartsEl.appendChild(chartEl);
 
+  // ported from https://github.com/spreadshirt/es-stream-logs/blob/7f320ff3d5d9abb454e69faba041e6a7f107710e/es-stream-logs.py#L201-L216
+  let parseOffset = (offset) => {
+    if (typeof offset == "number") {
+      return offset;
+    }
+    let suffix = offset[offset.length-1];
+    let num = Number.parseInt(offset.substr(0, offset.length-1));
+    switch (suffix) {
+    case "s":
+      return num;
+    case "m":
+      return num * 60;
+    case "h":
+      return num * 60 * 60;
+    case "d":
+      return num * 24 * 60 * 60;
+    default:
+      throw `could not parse offset ${offset}`;
+    }
+  }
+
   let toDate = (d) => {
     if (d instanceof Date) {
       return d;
     }
     if (d == "now") {
       return new Date();
+    }
+    if (d.startsWith("now-")) {
+      return new Date((new Date().getTime()) - parseOffset(d.substr(4, d.length))*1000);
     }
     return new Date(d);
   }
@@ -340,7 +364,7 @@ function createChart(name, config, global) {
     u.searchParams.set("end", toDateString(to));
     // step size in seconds chosen to yield 200 steps per chart
     let autoStep = Math.max(1, Math.round((to - from) / 1000 / 200));
-    let step = config.step || global.defaults.step || autoStep;
+    let step = parseOffset(config.step || global.defaults.step || autoStep);
     u.searchParams.set("step", step);
     let request = new Request(u.toString());
 
@@ -375,11 +399,6 @@ function createChart(name, config, global) {
             data: metric.values
               .map(([t, v]) => ({t: new Date(t*1000), y: (Number.parseFloat(v))}))
               .map((kv, idx, arr) => {
-                if (step instanceof String) {
-                  // TODO: support gaps for time-spec step sizes
-                  return kv;
-                }
-
                 if (idx+1 >= arr.length) {
                   return kv;
                 }
