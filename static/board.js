@@ -340,7 +340,8 @@ function createChart(name, config, global) {
     u.searchParams.set("end", toDateString(to));
     // step size in seconds chosen to yield 200 steps per chart
     let autoStep = Math.min(1, Math.round((to - from) / 1000 / 200));
-    u.searchParams.set("step", config.step || global.defaults.step || autoStep);
+    let step = config.step || global.defaults.step || autoStep;
+    u.searchParams.set("step", step);
     let request = new Request(u.toString());
 
     let start = new Date();
@@ -371,7 +372,24 @@ function createChart(name, config, global) {
           let color = Math.floor(Math.random()*360);
           myChart.data.datasets.push({
             label: label,
-            data: metric.values.map(([t, v]) => ({t: new Date(t*1000), y: (v == "NaN" ? 0 : v)})),
+            data: metric.values
+              .map(([t, v]) => ({t: new Date(t*1000), y: (Number.parseFloat(v))}))
+              .map((kv, idx, arr) => {
+                if (step instanceof String) {
+                  // TODO: support gaps for time-spec step sizes
+                  return kv;
+                }
+
+                if (idx+1 >= arr.length) {
+                  return kv;
+                }
+
+                if (!isNaN(kv.y) && (arr[idx+1].t.getTime() - kv.t.getTime()) > step*1000) {
+                  arr.splice(idx+1, 0, {t: new Date(kv.t.getTime()+1), y: NaN});
+                }
+
+                return kv;
+              }),
             borderColor: `hsl(${color}, 90%, 50%)`,
             backgroundColor: `hsla(${color}, 90%, 50%, 0.3)`,
             pointRadius: 0,
