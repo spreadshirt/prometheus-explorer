@@ -375,6 +375,7 @@ function createChart(name, config, global) {
             borderColor: `hsl(${color}, 90%, 50%)`,
             backgroundColor: `hsla(${color}, 90%, 50%, 0.3)`,
             pointRadius: 0,
+            pointHoverRadius: 2,
             borderWidth: 1,
           });
         }
