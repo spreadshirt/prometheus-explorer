@@ -100,12 +100,11 @@ let crosshairPlugin = {
 
 update();
 configEl.addEventListener("change", update);
-configEl.addEventListener("keydown", (ev) => {
+
+window.addEventListener("keydown", (ev) => {
   if (ev.ctrlKey && ev.key == "Enter") {
     globalErrEl.textContent = "";
-
     update();
-    ev.preventDefault();
   }
 });
 
