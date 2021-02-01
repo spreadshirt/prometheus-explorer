@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -22,7 +23,8 @@ var config struct {
 var boardTmpl *template.Template
 
 func main() {
-	config.Addr = "localhost:12345"
+	flag.StringVar(&config.Addr, "addr", "localhost:12345", "The address to listen on.")
+	flag.Parse()
 
 	var err error
 	boardTmpl, err = template.ParseFiles("board.tmpl")
