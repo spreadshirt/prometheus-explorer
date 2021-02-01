@@ -33,7 +33,7 @@ searchEl.onkeydown = (ev) => {
 }
 
 function listSeries() {
-  let u = new URL(`http://${config.defaults.source}/api/v1/series`);
+  let u = new URL(`${location.protocol}//${config.defaults.source}/api/v1/series`);
   let searchStart = new Date();
   searchStart.setHours(searchStart.getHours() - 6);
   u.searchParams.set("match[]", searchEl.value);
