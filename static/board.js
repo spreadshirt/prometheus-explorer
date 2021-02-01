@@ -117,6 +117,41 @@ function update() {
     config.shortcuts.push(shortcut);
   }
 
+  config.annotations = config.annotations || [];
+  for (let annotation of config.annotations) {
+    let defaults = config.defaults;
+    let url = eval("`"+annotation.url+"`");
+    fetch(new Request(url))
+      .then((resp) => resp.json())
+      .then((resp) => {
+        annotation.data = resp.hits.hits.map((doc) => {
+          let v = doc._source["@timestamp"]
+          return {t: new Date(v.endsWith("Z") ? v : v+"Z")}
+        })
+
+        for (let name in Chart.instances) {
+          let myChart = Chart.instances[name];
+          for (let ann of annotation.data) {
+            let color = annotation.color;
+            if (!annotation.color) {
+              Math.seedrandom(annotation.url);
+              color = `hsl(${Math.floor(Math.random()*360)}, 90%, 50%)`;
+            }
+            myChart.options.annotation.annotations.push({
+              type: "line",
+              scaleID: "x-axis-0",
+              mode: "vertical",
+              borderColor: color,
+              borderWidth: 1,
+              value: ann.t.getTime(),
+            });
+            myChart.update();
+          }
+        }
+      })
+     .catch((err) => { throw err });
+  }
+
   for (let key in config) {
     if (key == "defaults" || key == "annotations" || key == "variables" || key == "shortcuts") {
       continue;
