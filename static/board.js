@@ -111,6 +111,27 @@ window.addEventListener("keydown", (ev) => {
 function update() {
   config = jsyaml.load(configEl.value);
 
+  // set overrides from query params
+  // FIXME: potential confusion because query overrides config, even if config is more recent
+  for (let [key, val] of new URL(location.href).searchParams.entries()) {
+    if (key == "from" || key == "to") {
+      key = "defaults." + key;
+    }
+
+    key.split(".").reduce((config, key, idx, arr) => {
+      if (!config) {
+        return null;
+      }
+
+      if (idx == arr.length-1) {
+        config[key] = val;
+        return null;
+      }
+
+      return config[key];
+    }, config);
+  }
+
   config.shortcuts = config.shortcuts || [];
   let shortcuts = jsyaml.load(shortcutsEl.value);
   for (let shortcut of shortcuts.shortcuts) {
