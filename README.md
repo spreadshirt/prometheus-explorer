@@ -49,8 +49,8 @@ be missing features, bugs and other oddities.
 - I am happy with Grafana, why do I need this?
 
     You don't.  If you're happy with Grafana, keep using that.  If you
-    miss some of the interactive features mentioned here, you maybe
-    you'll find them useful, or maybe you'll build them into Grafana.
+    miss some of the interactive features mentioned above, maybe you'll
+    find this project useful.
 - I am happy with Prometheus' [expression browser](https://prometheus.io/docs/visualization/browser/),
   why do I need this?
 
