@@ -396,7 +396,6 @@ function createChart(name, config, global) {
     } else {
       delete myChart.options.scales.yAxes[0].ticks.max;
     }
-    myChart.data.datasets = [];
 
     let toDateString = (d) => {
       if (d instanceof Date) {
@@ -435,6 +434,9 @@ function createChart(name, config, global) {
         return resp;
       })
       .then(resp => {
+        // reset dataset only after data has loaded (?)
+        myChart.data.datasets = [];
+
         let maxSeries = config.max_series || global.defaults.max_series;
         if (resp.data.result.length > maxSeries) {
           errEl.textContent = `too many metrics, displaying only first ${maxSeries}`;
