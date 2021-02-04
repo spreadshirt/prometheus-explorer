@@ -24,7 +24,11 @@ be missing features, bugs and other oddities.
 - ✨ define custom shortcuts for commonly used queries
 
     ```yaml
+    variables:
+      cluster: eu
+
     shortcuts:
+    # cpu usage of pods of $service running in $cluster
     - regexp: "cpu of (.*)"
       query: rate(container_cpu_usage_seconds_total{cluster=~"${vars.cluster}.*", pod=~"${match[1]}.*", image!="", container!="POD"}[5m])
     ```
