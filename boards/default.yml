@@ -1,8 +1,7 @@
 defaults:
   source: localhost:9090
-  from: "2021-01-30T14:00:00Z"
-  to: now #"2021-01-26T00:00:00Z"
-  step: 1m
+  from: now-1h
+  to: now
   max_series: 10
 variables:
   cluster: "eu"
@@ -12,11 +11,14 @@ up:
   query: up
   label: job
 
-network:
+network-receive:
   query: rate(node_network_receive_bytes_total{device="wlp3s0"}[5m])
   unit: bytes
   label: device
 
-shortcuts:
-  - regexp: "cpu of (.*)"
-    query: rate(container_cpu_usage_seconds_total{cluster=~"${vars.cluster}.*", pod=~"${match[1]}.*", image!="", container!="POD"}[5m])
+network:
+  unit: bytes
+  label: device
+  queries:
+  - query: rate(node_network_receive_bytes_total{device="wlp3s0"}[5m])
+  - query: -rate(node_network_transmit_bytes_total{device="wlp3s0"}[5m])

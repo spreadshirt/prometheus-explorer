@@ -344,28 +344,10 @@ function createChart(name, config, global) {
 
   render(name, config, global);
 
-  function render(name, config, global) {
+  async function render(name, config, global) {
     numLabels = 0;
 
-    generatedQueryEl.value = "";
-    for (let shortcut of global.shortcuts) {
-      let match = config.query.match(shortcut.regexp);
-      if (match) {
-        let vars = global.variables;
-        config.query = eval("`"+shortcut.query+"`");
-        generatedQueryEl.style.display = "block";
-        generatedQueryEl.value = config.query;
-        generatedQueryEl.size = config.query.length;
-        config.unit = shortcut.unit;
-        config.label = eval("`"+shortcut.label+"`");
-      }
-    }
-
-    let chartURL = new URL(`${location.protocol}//${global.defaults.source}/graph`);
-    chartURL.searchParams.set("g0.expr", config.query);
-    chartURL.searchParams.set("g0.tab", "0"); // display graph
-    linkEl.href = chartURL.toString();
-
+    // adjust chart options
     if (config.y_max) {
       myChart.options.scales.yAxes[0].ticks.max = config.y_max;
     } else {
@@ -375,80 +357,137 @@ function createChart(name, config, global) {
     myChart.options.scales.xAxes[0].ticks.min = toDate(config.from || global.defaults.from);
     myChart.options.scales.xAxes[0].ticks.max = toDate(config.to || global.defaults.to);
 
-    let u = new URL(`${location.protocol}//${global.defaults.source}/api/v1/query_range`);
-    u.searchParams.set("query", config.query);
-    let from = toDate(config.from || global.defaults.from);
-    let to = toDate(config.to || global.defaults.to);
-    u.searchParams.set("start", toDateString(from));
-    u.searchParams.set("end", toDateString(to));
-    // step size in seconds chosen to yield 200 steps per chart
-    let autoStep = Math.max(1, Math.round((to - from) / 1000 / 200));
-    let step = parseOffset(config.step || global.defaults.step || autoStep);
-    u.searchParams.set("step", step);
-    let request = new Request(u.toString());
+    let queries = [];
+    if (config.query) {
+      queries.push({query: config.query})
+    }
+    for (let query of (config.queries || [])) {
+      queries.push(query);
+    }
+
+    let chartURL = new URL(`${location.protocol}//${global.defaults.source}/graph`);
+    queries.forEach((query, idx) => {
+      chartURL.searchParams.set(`g${idx}.expr`, query.query);
+      chartURL.searchParams.set(`g${idx}.tab`, "0"); // display graph
+    });
+    linkEl.href = chartURL.toString();
+
+    generatedQueryEl.value = "";
+
+    let datasets = [];
+    for (let query of queries) {
+
+      for (let shortcut of global.shortcuts) {
+        let match = query.query.match(shortcut.regexp);
+        if (match) {
+          let vars = global.variables;
+          query = eval("`"+shortcut.query+"`");
+          generatedQueryEl.style.display = "block";
+          generatedQueryEl.value = query.query;
+          generatedQueryEl.size = query.query.length;
+          config.unit = shortcut.unit;
+          config.label = eval("`"+shortcut.label+"`");
+        }
+      }
+
+      datasets.push(fetchDataset({
+        query: query.query,
+        from: config.from,
+        to: config.to,
+        // FIXME: support display of all datasets (only displays one so far)
+        label: query.label || config.label,
+        unit: config.unit,
+        max_series: config.max_series,
+        y_max: config.y_max,
+      }, global));
+    }
 
     let start = new Date();
     durEl.textContent = "updating...";
     errEl.textContent = "";
-    fetch(request)
-      .then(resp => resp.json())
-      .then(resp => {
-        if (resp.status != "success") {
-          throw JSON.stringify(resp);
-        }
-        return resp;
-      })
-      .then(resp => {
-        // reset dataset only after data has loaded (?)
-        myChart.data.datasets = [];
 
-        let maxSeries = config.max_series || global.defaults.max_series;
-        if (resp.data.result.length > maxSeries) {
-          errEl.textContent = `too many metrics, displaying only first ${maxSeries}`;
-        }
-        for (metric of resp.data.result.slice(0, maxSeries)) {
-          let label = JSON.stringify(metric.metric);
-          if (config.label != undefined) {
-            label = metric.metric[config.label] || config.label;
-          }
-          Math.seedrandom(JSON.stringify(metric.metric));
-          if (Object.keys(metric.metric).length == 0) {
-            Math.seedrandom(config.query);
-          }
-          let color = Math.floor(Math.random()*360);
-          myChart.data.datasets.push({
-            label: label,
-            data: metric.values
-              .map(([t, v]) => ({t: new Date(t*1000), y: (Number.parseFloat(v))}))
-              .map((kv, idx, arr) => {
-                if (idx+1 >= arr.length) {
-                  return kv;
-                }
+    Promise.all(datasets).then((results) => {
+      // reset dataset only after data has loaded (?)
+      myChart.data.datasets = [];
 
-                if (!isNaN(kv.y) && (arr[idx+1].t.getTime() - kv.t.getTime()) > step*1000) {
-                  arr.splice(idx+1, 0, {t: new Date(kv.t.getTime()+1), y: NaN});
-                }
+      for (let result of results) {
+        Array.prototype.push.apply(myChart.data.datasets, result);
+      }
 
-                return kv;
-              }),
-            borderColor: `hsl(${color}, 90%, 50%)`,
-            backgroundColor: `hsla(${color}, 90%, 50%, 0.3)`,
-            pointRadius: 0,
-            pointHoverRadius: 2,
-            borderWidth: 1,
-          });
-        }
-        myChart.update();
-        durEl.textContent = (new Date() - start) + "ms";
-        if (resp.data.result.length == 0) {
-          errEl.textContent = "no results";
-        }
-      })
-      .catch(err => {
-        durEl.textContent = (new Date() - start) + "ms";
-        errEl.textContent = err.toString();
-      });
+      myChart.update();
+    }).catch((err) => {
+      errEl.textContent = err;
+    }).finally(() => {
+      durEl.textContent = new Date() - start + "ms";
+    });
   }
+}
+
+async function fetchDataset(config, global) {
+  let u = new URL(`${location.protocol}//${global.defaults.source}/api/v1/query_range`);
+  u.searchParams.set("query", config.query);
+
+  let from = toDate(config.from || global.defaults.from);
+  let to = toDate(config.to || global.defaults.to);
+  u.searchParams.set("start", toDateString(from));
+  u.searchParams.set("end", toDateString(to));
+
+  // step size in seconds chosen to yield 200 steps per chart
+  let autoStep = Math.max(1, Math.round((to - from) / 1000 / 200));
+  let step = parseOffset(config.step || global.defaults.step || autoStep);
+  u.searchParams.set("step", step);
+
+  let request = new Request(u.toString());
+  let resp = await fetch(request)
+    .then(resp => resp.json())
+    .then(resp => {
+      if (resp.status != "success") {
+        throw JSON.stringify(resp);
+      }
+      return resp;
+    });
+
+  let maxSeries = config.max_series || global.defaults.max_series;
+  if (resp.data.result.length > maxSeries) {
+    throw `too many metrics, displaying only first ${maxSeries}`;
+  }
+
+  let datasets = [];
+
+  for (metric of resp.data.result.slice(0, maxSeries)) {
+    let label = JSON.stringify(metric.metric);
+    if (config.label != undefined) {
+      label = metric.metric[config.label] || config.label;
+    }
+    Math.seedrandom(JSON.stringify(metric.metric));
+    if (Object.keys(metric.metric).length == 0) {
+      Math.seedrandom(config.query);
+    }
+    let color = Math.floor(Math.random()*360);
+    datasets.push({
+      label: label,
+      data: metric.values
+      .map(([t, v]) => ({t: new Date(t*1000), y: (Number.parseFloat(v))}))
+      .map((kv, idx, arr) => {
+        if (idx+1 >= arr.length) {
+          return kv;
+        }
+
+        if (!isNaN(kv.y) && (arr[idx+1].t.getTime() - kv.t.getTime()) > step*1000) {
+          arr.splice(idx+1, 0, {t: new Date(kv.t.getTime()+1), y: NaN});
+        }
+
+        return kv;
+      }),
+      borderColor: `hsl(${color}, 90%, 50%)`,
+      backgroundColor: `hsla(${color}, 90%, 50%, 0.3)`,
+      pointRadius: 0,
+      pointHoverRadius: 2,
+      borderWidth: 1,
+    });
+  }
+
+  return datasets;
 }
 
 // ported from https://github.com/spreadshirt/es-stream-logs/blob/7f320ff3d5d9abb454e69faba041e6a7f107710e/es-stream-logs.py#L201-L216
