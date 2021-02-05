@@ -205,7 +205,10 @@ function createChart(name, config, global) {
   let chartEl = document.createElement("article");
   chartEl.classList.add("chart");
   let titleEl = document.createElement("h1");
-  titleEl.textContent = name;
+  titleEl.textContent = name + " ";
+  let linkEl = document.createElement("a");
+  linkEl.textContent = "🔗";
+  titleEl.appendChild(linkEl);
   chartEl.appendChild(titleEl);
   let canvasEl = document.createElement("canvas");
   canvasEl.width = 800;
@@ -390,6 +393,11 @@ function createChart(name, config, global) {
         config.label = eval("`"+shortcut.label+"`");
       }
     }
+
+    let chartURL = new URL(`${location.protocol}//${global.defaults.source}/graph`);
+    chartURL.searchParams.set("g0.expr", config.query);
+    chartURL.searchParams.set("g0.tab", "0"); // display graph
+    linkEl.href = chartURL.toString();
 
     if (config.y_max) {
       myChart.options.scales.yAxes[0].ticks.max = config.y_max;
