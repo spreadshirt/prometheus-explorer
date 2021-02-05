@@ -232,40 +232,6 @@ function createChart(name, config, global) {
 
   chartsEl.appendChild(chartEl);
 
-  // ported from https://github.com/spreadshirt/es-stream-logs/blob/7f320ff3d5d9abb454e69faba041e6a7f107710e/es-stream-logs.py#L201-L216
-  let parseOffset = (offset) => {
-    if (typeof offset == "number") {
-      return offset;
-    }
-    let suffix = offset[offset.length-1];
-    let num = Number.parseInt(offset.substr(0, offset.length-1));
-    switch (suffix) {
-    case "s":
-      return num;
-    case "m":
-      return num * 60;
-    case "h":
-      return num * 60 * 60;
-    case "d":
-      return num * 24 * 60 * 60;
-    default:
-      throw `could not parse offset ${offset}`;
-    }
-  }
-
-  let toDate = (d) => {
-    if (d instanceof Date) {
-      return d;
-    }
-    if (d == "now") {
-      return new Date();
-    }
-    if (d.startsWith("now-")) {
-      return new Date((new Date().getTime()) - parseOffset(d.substr(4, d.length))*1000);
-    }
-    return new Date(d);
-  }
-
   let numLabels = 0;
   var ctx = canvasEl.getContext("2d");
   var myChart = new Chart(ctx, {
@@ -406,16 +372,6 @@ function createChart(name, config, global) {
       delete myChart.options.scales.yAxes[0].ticks.max;
     }
 
-    let toDateString = (d) => {
-      if (d instanceof Date) {
-        return d.toISOString();
-      }
-      if (d == "now") {
-        return new Date().toISOString();
-      }
-      return d;
-    }
-
     myChart.options.scales.xAxes[0].ticks.min = toDate(config.from || global.defaults.from);
     myChart.options.scales.xAxes[0].ticks.max = toDate(config.to || global.defaults.to);
 
@@ -493,6 +449,50 @@ function createChart(name, config, global) {
         errEl.textContent = err.toString();
       });
   }
+}
+
+// ported from https://github.com/spreadshirt/es-stream-logs/blob/7f320ff3d5d9abb454e69faba041e6a7f107710e/es-stream-logs.py#L201-L216
+function parseOffset(offset) {
+  if (typeof offset == "number") {
+    return offset;
+  }
+  let suffix = offset[offset.length-1];
+  let num = Number.parseInt(offset.substr(0, offset.length-1));
+  switch (suffix) {
+    case "s":
+      return num;
+    case "m":
+      return num * 60;
+    case "h":
+      return num * 60 * 60;
+    case "d":
+      return num * 24 * 60 * 60;
+    default:
+      throw `could not parse offset ${offset}`;
+  }
+}
+
+function toDate(d) {
+  if (d instanceof Date) {
+    return d;
+  }
+  if (d == "now") {
+    return new Date();
+  }
+  if (d.startsWith("now-")) {
+    return new Date((new Date().getTime()) - parseOffset(d.substr(4, d.length))*1000);
+  }
+  return new Date(d);
+}
+
+function toDateString(d) {
+  if (d instanceof Date) {
+    return d.toISOString();
+  }
+  if (d == "now") {
+    return new Date().toISOString();
+  }
+  return d;
 }
 
 function formatUnit(value, unit) {
