@@ -152,6 +152,7 @@ function update() {
 
         for (let name in Chart.instances) {
           let myChart = Chart.instances[name];
+          myChart.options.annotation.annotations = [];
           for (let ann of annotation.data) {
             let color = annotation.color;
             if (!annotation.color) {
@@ -166,8 +167,8 @@ function update() {
               borderWidth: 1,
               value: ann.t.getTime(),
             });
-            myChart.update();
           }
+          myChart.update();
         }
       })
      .catch((err) => { throw err });
