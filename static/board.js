@@ -260,6 +260,7 @@ function createChart(name, config, global) {
           },
         }],
         yAxes: [{
+          stacked: config.stacked || global.defaults.stacked || false,
           ticks: {
             beginAtZero: true,
             callback: function(value, index, values) {
@@ -353,6 +354,8 @@ function createChart(name, config, global) {
     } else {
       delete myChart.options.scales.yAxes[0].ticks.max;
     }
+
+    myChart.options.scales.yAxes[0].stacked = config.stacked || global.defaults.stacked || false;
 
     myChart.options.scales.xAxes[0].ticks.min = toDate(config.from || global.defaults.from);
     myChart.options.scales.xAxes[0].ticks.max = toDate(config.to || global.defaults.to);
