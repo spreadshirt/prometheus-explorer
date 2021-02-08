@@ -381,7 +381,7 @@ function createChart(name, config, global) {
         let match = query.query.match(shortcut.regexp);
         if (match) {
           let vars = global.variables;
-          query = eval("`"+shortcut.query+"`");
+          query.query = eval("`"+shortcut.query+"`");
           generatedQueryEl.style.display = "block";
           generatedQueryEl.value = query.query;
           generatedQueryEl.size = query.query.length;
