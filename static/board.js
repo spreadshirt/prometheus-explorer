@@ -288,6 +288,7 @@ function createChart(name, config, global) {
         intersect: false,
         axis: "x",
         itemSort: function(a, b) { return b.yLabel - a.yLabel; },
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
         callbacks: {
           label: function(tooltipItem, data) {
             let label = data.datasets[tooltipItem.datasetIndex].label || '';
