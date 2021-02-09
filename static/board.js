@@ -203,12 +203,17 @@ function update() {
   }, 10 * 1000);*/
 
 function createChart(name, config, global) {
+  let vars = global.variables;
+
   let chartEl = document.createElement("article");
   chartEl.classList.add("chart");
   let titleEl = document.createElement("h1");
-  titleEl.textContent = name + " ";
+  let titleNode = document.createTextNode("");
+  titleNode.textContent = config.name ? eval("`"+config.name+"`") : name;
   let linkEl = document.createElement("a");
   linkEl.textContent = "🔗";
+  titleEl.appendChild(titleNode);
+  titleEl.appendChild(document.createTextNode(" "));
   titleEl.appendChild(linkEl);
   chartEl.appendChild(titleEl);
   let canvasEl = document.createElement("canvas");
@@ -350,6 +355,8 @@ function createChart(name, config, global) {
   async function render(name, config, global) {
     numLabels = 0;
 
+    let vars = global.variables;
+
     // adjust chart options
     if (config.y_max) {
       myChart.options.scales.yAxes[0].ticks.max = config.y_max;
@@ -370,6 +377,9 @@ function createChart(name, config, global) {
       queries.push(query);
     }
 
+    titleNode.textContent = config.name ? eval("`"+config.name+"`") : name;
+    titleEl.title = queries.map(q => q.query).join("\n");
+
     let chartURL = new URL(`${location.protocol}//${global.defaults.source}/graph`);
     queries.forEach((query, idx) => {
       chartURL.searchParams.set(`g${idx}.expr`, query.query);
@@ -385,7 +395,6 @@ function createChart(name, config, global) {
       for (let shortcut of global.shortcuts) {
         let match = query.query.match(shortcut.regexp);
         if (match) {
-          let vars = global.variables;
           query.query = eval("`"+shortcut.query+"`");
           generatedQueryEl.style.display = "block";
           generatedQueryEl.value = query.query;
