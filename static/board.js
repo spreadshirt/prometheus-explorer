@@ -365,6 +365,9 @@ function createChart(name, config, global) {
     }
 
     myChart.options.scales.yAxes[0].stacked = config.stacked || global.defaults.stacked || false;
+    myChart.options.scales.yAxes[0].ticks.callback = function(value, index, values) {
+      return formatUnit(value, config.unit);
+    };
 
     myChart.options.scales.xAxes[0].ticks.min = toDate(config.from || global.defaults.from);
     myChart.options.scales.xAxes[0].ticks.max = toDate(config.to || global.defaults.to);
