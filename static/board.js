@@ -405,7 +405,7 @@ function createChart(name, config, global) {
       }
 
       datasets.push(fetchDataset({
-        query: query.query,
+        query: eval("`"+query.query+"`"),
         from: config.from,
         to: config.to,
         // FIXME: support display of all datasets (only displays one so far)
