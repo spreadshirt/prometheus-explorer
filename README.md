@@ -10,6 +10,8 @@ referencing of metrics that belong to many different services or boards.
 **Note:** This software is in an *alpha* state, so there will probably
 be missing features, bugs and other oddities.
 
+![example screenshot](./prometheus-explorer-example.png)
+
 ## Features
 
 - ✨ quickly explore metrics interactively
