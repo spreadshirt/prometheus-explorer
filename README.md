@@ -15,14 +15,7 @@ be missing features, bugs and other oddities.
 ## Features
 
 - ✨ quickly explore metrics interactively
-- ✨ define custom metrics on-the-fly using [YAML](https://yaml.org/)
-
-    ```yaml
-    network:
-      query: rate(node_network_receive_bytes_total{device="wlp3s0"}[5m])
-      unit: bytes
-      label: device
-    ```
+- ✨ search for metrics using regular expressions
 - ✨ define custom shortcuts for commonly used queries
 
     ```yaml
@@ -34,7 +27,14 @@ be missing features, bugs and other oddities.
     - regexp: "cpu of (.*)"
       query: rate(container_cpu_usage_seconds_total{cluster=~"${vars.cluster}.*", pod=~"${match[1]}.*", image!="", container!="POD"}[5m])
     ```
-- ✨ search for metrics using regular expressions
+- ✨ define custom metrics on-the-fly using [YAML](https://yaml.org/)
+
+    ```yaml
+    network:
+      query: rate(node_network_receive_bytes_total{device="wlp3s0"}[5m])
+      unit: bytes
+      label: device
+    ```
 - not implemented yet:
     - reference metrics from other boards, e.g. "http requests of this service"
 
