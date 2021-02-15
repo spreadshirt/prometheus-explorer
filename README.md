@@ -40,6 +40,18 @@ be missing features, bugs and other oddities.
 
 ## Installation
 
+### Docker
+
+1. build the docker image using `docker build -t prometheus-explorer:local .`
+2. run `docker run -it --rm -p 12345:12345 prometheus-explorer:local`
+3. visit <http://localhost:12345>
+    - note that the default board expects a local Prometheus server at
+      `localhost:9090` and [`node_exporter`](https://github.com/prometheus/node_exporter)
+      for some metrics, so either set those up or point `default.source`
+      in the config to your existing Prometheus server.
+
+### Local build
+
 1. `git clone https://github.com/spreadshirt/prometheus-explorer`
 2. run `go build .` in the cloned directory
 3. run `./prometheus-explorer`
