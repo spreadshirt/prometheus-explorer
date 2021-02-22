@@ -112,7 +112,7 @@ func handleNameAutocomplete(w http.ResponseWriter, req *http.Request) {
 
 	matchRE, err := regexp.Compile(match)
 	if err != nil {
-		log.Printf("decoding names: %s", err)
+		log.Printf("compiling match: %s", err)
 		return
 	}
 
@@ -123,7 +123,7 @@ func handleNameAutocomplete(w http.ResponseWriter, req *http.Request) {
 	enc := json.NewEncoder(w)
 
 	if !cached {
-		resp, err := http.Get("http://" + source + "/api/v1/label/__name__/values")
+		resp, err := http.Get(source + "/api/v1/label/__name__/values")
 		if err != nil {
 			log.Printf("getting names: %s", err)
 			return

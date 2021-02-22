@@ -1,5 +1,5 @@
 defaults:
-  source: localhost:9090
+  source: http://localhost:9090
   from: now-1h
   to: now
   max_series: 10

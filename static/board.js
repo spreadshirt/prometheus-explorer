@@ -383,7 +383,7 @@ function createChart(name, config, global) {
     titleNode.textContent = config.name ? eval("`"+config.name+"`") : name;
     titleEl.title = queries.map(q => q.query).join("\n");
 
-    let chartURL = new URL(`${location.protocol}//${global.defaults.source}/graph`);
+    let chartURL = new URL(`${global.defaults.source}/graph`);
     queries.forEach((query, idx) => {
       chartURL.searchParams.set(`g${idx}.expr`, query.query);
       chartURL.searchParams.set(`g${idx}.tab`, "0"); // display graph
@@ -441,7 +441,7 @@ function createChart(name, config, global) {
 }
 
 async function fetchDataset(config, global) {
-  let u = new URL(`${location.protocol}//${global.defaults.source}/api/v1/query_range`);
+  let u = new URL(`${global.defaults.source}/api/v1/query_range`);
   u.searchParams.set("query", config.query);
 
   let from = toDate(config.from || global.defaults.from);
