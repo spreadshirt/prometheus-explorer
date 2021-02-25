@@ -364,6 +364,11 @@ function createChart(name, config, global) {
       delete myChart.options.scales.yAxes[0].ticks.max;
     }
 
+    let legend = config.legend || global.defaults.legend;
+    if (legend != undefined) {
+      myChart.options.legend.display = legend;
+    }
+
     myChart.options.scales.yAxes[0].stacked = config.stacked || global.defaults.stacked || false;
     myChart.options.scales.yAxes[0].ticks.callback = function(value, index, values) {
       return formatUnit(value, config.unit);
