@@ -209,7 +209,7 @@ function createChart(name, config, global) {
   chartEl.classList.add("chart");
   let titleEl = document.createElement("h1");
   let titleNode = document.createTextNode("");
-  titleNode.textContent = config.name ? eval("`"+config.name+"`") : name;
+  titleNode.textContent = eval("`"+(config.name || name)+"`");
   let linkEl = document.createElement("a");
   linkEl.textContent = "🔗";
   titleEl.appendChild(titleNode);
@@ -385,7 +385,7 @@ function createChart(name, config, global) {
       queries.push(query);
     }
 
-    titleNode.textContent = config.name ? eval("`"+config.name+"`") : name;
+    titleNode.textContent = eval("`"+(config.name || name)+"`");
     titleEl.title = queries.map(q => q.query).join("\n");
 
     let chartURL = new URL(`${global.defaults.source}/graph`);
