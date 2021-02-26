@@ -5,6 +5,9 @@ window.onerror = (msg, url, line) => {
 
 let configEl = document.getElementById("config");
 let config = {};
+let configUpdated = new Date();
+configEl.onchange = () => configUpdated = new Date();
+let overridesUpdated = new Date();
 let shortcutsEl = document.getElementById("shortcuts");
 let chartsEl = document.getElementById("charts");
 let charts = {};
@@ -103,6 +106,10 @@ configEl.addEventListener("change", update);
 
 window.addEventListener("keydown", (ev) => {
   if (ev.ctrlKey && ev.key == "Enter") {
+    if (ev.target == configEl) {
+      configUpdated = new Date();
+    }
+
     globalErrEl.textContent = "";
     update();
   }
@@ -130,6 +137,58 @@ function update() {
 
       return config[key];
     }, config);
+  }
+
+  // quick access overrides
+  let overridesEl = document.getElementById("overrides");
+  function createOverride(name, initialValue, setValueFn) {
+    let varEl = overridesEl.querySelector(`[data-name=${name}]`);
+    if (varEl == null) {
+      varEl = document.createElement("span");
+      varEl.dataset['name'] = name;
+
+      let nameEl = document.createElement("label");
+      nameEl.textContent = name + ":";
+      varEl.appendChild(nameEl);
+      varEl.appendChild(document.createTextNode(" "));
+
+      let valEl = document.createElement("input");
+      valEl.name = name;
+      valEl.value = initialValue;
+      valEl.size = valEl.value.length;
+      valEl.onchange = function(ev) {
+        valEl.size = valEl.value.length;
+
+        overridesUpdated = new Date();
+        setValueFn(ev.target.value);
+
+        update();
+      }
+      varEl.appendChild(valEl);
+
+      overridesEl.appendChild(varEl);
+    }
+  }
+
+  createOverride("from", config.defaults.from, (val) => config.from = val);
+  createOverride("to", config.defaults.to, (val) => config.defaults.to = val);
+  for (let key in config.variables) {
+    createOverride(key, config.variables[key], (val) => config.variables[key] = val);
+  }
+  if (overridesUpdated > configUpdated) {
+    config.defaults.from = overridesEl.querySelector("[name=from]").value;
+    config.defaults.to = overridesEl.querySelector("[name=to]").value;
+    for (let key in config.variables) {
+      // overrides value from config
+      // TODO: notify about override in yaml somehow
+      config.variables[key] = overridesEl.querySelector(`[name=${key}]`).value;
+    }
+  } else {
+    overridesEl.querySelector("[name=from]").value = config.defaults.from;
+    overridesEl.querySelector("[name=to]").value = config.defaults.to;
+    for (let key in config.variables) {
+      overridesEl.querySelector(`[name=${key}]`).value = config.variables[key];
+    }
   }
 
   config.shortcuts = config.shortcuts || [];

@@ -46,6 +46,20 @@
 		font-weight: bold;
 	}
 
+	#overrides {
+		display: flex;
+	}
+
+	#overrides span {
+		margin-right: 1ex;
+	}
+
+	/* align time range to the right */
+	#overrides [data-name=from] { margin-left: auto; }
+	#overrides [data-name=from], #overrides [data-name=to] {
+		order: 10;
+	}
+
 	#charts {
 		display: flex;
 		flex-wrap: wrap;
@@ -113,6 +127,10 @@
 
 		<a href="https://prometheus.io/docs/prometheus/latest/querying/basics/">Prometheus Docs</a>
 	</nav>
+
+	<form id="overrides">
+		<span>Temporary overrides:</span>
+	</form>
 
 	<h1>{{ .Title }}</h1>
 
