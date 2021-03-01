@@ -467,16 +467,20 @@ function createChart(name, config, global) {
           generatedQueryEl.value = query.query;
           generatedQueryEl.size = query.query.length;
           config.unit = shortcut.unit;
-          config.label = eval("`"+shortcut.label+"`");
+          config.label = shortcut.label;
         }
       }
 
+      let label = query.label || config.label;
+      if (label) {
+        label = eval("`"+label+"`");
+      }
       datasets.push(fetchDataset({
         query: eval("`"+query.query+"`"),
         from: config.from,
         to: config.to,
         // FIXME: support display of all datasets (only displays one so far)
-        label: query.label || config.label,
+        label: label,
         unit: config.unit,
         max_series: config.max_series,
         y_max: config.y_max,
