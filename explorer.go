@@ -18,12 +18,17 @@ import (
 
 var config struct {
 	Addr string
+
+	CertFile string
+	KeyFile  string
 }
 
 var boardTmpl *template.Template
 
 func main() {
 	flag.StringVar(&config.Addr, "addr", "localhost:12345", "The address to listen on.")
+	flag.StringVar(&config.CertFile, "cert-file", "", "The HTTPS certificate to use")
+	flag.StringVar(&config.KeyFile, "key-file", "", "The HTTPS certificate key to use")
 	flag.Parse()
 
 	var err error
@@ -39,8 +44,14 @@ func main() {
 	r.HandleFunc("/{name}", saveBoard).Methods("POST")
 	r.HandleFunc("/", renderBoard).Methods("GET")
 
-	log.Printf("Listening on http://%s", config.Addr)
-	log.Fatal(http.ListenAndServe(config.Addr, handlers.CompressHandler(r)))
+	if config.CertFile == "" || config.KeyFile == "" {
+		log.Printf("Listening on http://%s", config.Addr)
+		log.Fatal(http.ListenAndServe(config.Addr, handlers.CompressHandler(r)))
+	} else {
+		log.Printf("Listening on https://%s", config.Addr)
+		log.Fatal(http.ListenAndServeTLS(config.Addr, config.CertFile, config.KeyFile, handlers.CompressHandler(r)))
+
+	}
 }
 
 func renderBoard(w http.ResponseWriter, req *http.Request) {
