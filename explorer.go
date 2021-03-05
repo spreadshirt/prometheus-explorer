@@ -7,8 +7,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"path"
 	"regexp"
+	"sort"
 	"strings"
 	"sync"
 
@@ -55,12 +57,42 @@ func main() {
 }
 
 func renderBoard(w http.ResponseWriter, req *http.Request) {
+	if req.URL.Query().Get("board") != "" {
+		http.Redirect(w, req, "/"+req.URL.Query().Get("board"), http.StatusSeeOther)
+		return
+	}
+
 	name := mux.Vars(req)["name"]
 	if name == "" {
 		name = "default"
 	}
 
 	isNew := false
+
+	boardFiles, err := os.ReadDir("boards")
+	if err != nil {
+		log.Printf("listing boards: %s", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	boards := make([]string, 0, len(boardFiles))
+	for _, boardFile := range boardFiles {
+		if boardFile.IsDir() {
+			continue
+		}
+
+		board := boardFile.Name()
+		if board == "default.yml" || board == "shortcuts.yml" {
+			continue
+		}
+
+		if strings.HasSuffix(board, ".yml") {
+			boards = append(boards, board[:len(board)-4])
+		}
+	}
+	sort.Strings(boards)
+	boards = append(boards, "default", "shortcuts")
 
 	// FIXME: restrict paths to only boards/
 	data, err := ioutil.ReadFile(path.Join("boards", name+".yml"))
@@ -83,6 +115,7 @@ func renderBoard(w http.ResponseWriter, req *http.Request) {
 	}
 
 	boardTmpl.Execute(w, map[string]interface{}{
+		"Boards":    boards,
 		"Title":     name,
 		"IsNew":     isNew,
 		"Config":    string(data),

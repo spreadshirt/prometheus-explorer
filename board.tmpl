@@ -23,6 +23,18 @@
 		right: 0;
 	}
 
+	nav {
+		display: flex;
+	}
+
+	nav .options {
+		margin-left: auto;
+	}
+
+	nav .options form {
+		display: inline-block;
+	}
+
 	#search {
 		z-index: 1;
 	}
@@ -125,7 +137,18 @@
 			<pre></pre>
 		</form>
 
-		<a href="https://prometheus.io/docs/prometheus/latest/querying/basics/">Prometheus Docs</a>
+		<div class="options">
+			<form method="GET" action="/">
+				{{ $currentBoard := .Title }}
+				<input type="text" name="board" list="boards" value="{{ $currentBoard }}" />
+				<datalist id="boards">
+				{{ range $board := .Boards }}
+					<option{{ if (eq $board $currentBoard) }} selected{{ end }}>{{ $board }}</option>
+				{{ end }}
+				</datalist>
+			</form>
+			<a href="https://prometheus.io/docs/prometheus/latest/querying/basics/">Prometheus Docs</a>
+		</div>
 	</nav>
 
 	<form id="overrides">
