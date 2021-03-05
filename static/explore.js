@@ -1,20 +1,28 @@
 let searchFormEl = document.getElementById("search");
 let searchEl = searchFormEl.querySelector("input");
 let metricNamesEl = searchFormEl.querySelector("#metric-names");
+let keepResultsOpen = false;
 let resultsEl = searchFormEl.querySelector("pre");
 let durEl = searchFormEl.querySelector(".duration");
 let errEl = searchFormEl.querySelector(".error");
 
 searchEl.onblur = (ev) => {
-  resultsEl.style.display = "none";
+  if (!keepResultsOpen) {
+    resultsEl.style.display = "none";
+  }
+}
+
+resultsEl.onmousenter = (ev) => { keepResultsOpen = true; };
+resultsEl.onmousedown = (ev) => { keepResultsOpen = true; };
+resultsEl.onmouseup = (ev) => { keepResultsOpen = false; };
+resultsEl.onmouseleave = (ev) => {
+  if (!keepResultsOpen) {
+    resultsEl.style.display = "none";
+  }
+  keepResultsOpen = false;
 }
 
 searchEl.onkeydown = (ev) => {
-  if (ev.key == "Escape") {
-    searchEl.blur();
-    return;
-  }
-
   if (ev.key == "Enter") {
     ev.preventDefault();
 
