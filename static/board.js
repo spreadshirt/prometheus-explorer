@@ -447,13 +447,6 @@ function createChart(name, config, global) {
     titleNode.textContent = eval("`"+(config.name || name)+"`");
     titleEl.title = queries.map(q => q.query).join("\n");
 
-    let chartURL = new URL(`${global.defaults.source}/graph`);
-    queries.forEach((query, idx) => {
-      chartURL.searchParams.set(`g${idx}.expr`, query.query);
-      chartURL.searchParams.set(`g${idx}.tab`, "0"); // display graph
-    });
-    linkEl.href = chartURL.toString();
-
     generatedQueryEl.value = "";
 
     let datasets = [];
@@ -475,8 +468,9 @@ function createChart(name, config, global) {
       if (label) {
         label = eval("`"+label+"`");
       }
+      query.query = eval("`"+query.query+"`");
       datasets.push(fetchDataset({
-        query: eval("`"+query.query+"`"),
+        query: query.query,
         from: config.from,
         to: config.to,
         // FIXME: support display of all datasets (only displays one so far)
@@ -486,6 +480,13 @@ function createChart(name, config, global) {
         y_max: config.y_max,
       }, global));
     }
+
+    let chartURL = new URL(`${global.defaults.source}/graph`);
+    queries.forEach((query, idx) => {
+      chartURL.searchParams.set(`g${idx}.expr`, query.query);
+      chartURL.searchParams.set(`g${idx}.tab`, "0"); // display graph
+    });
+    linkEl.href = chartURL.toString();
 
     let start = new Date();
     durEl.textContent = "updating...";
