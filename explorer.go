@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"html/template"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -44,6 +45,8 @@ func main() {
 	r.HandleFunc("/names", handleNameAutocomplete).Methods("GET")
 	r.HandleFunc("/{name}", renderBoard).Methods("GET")
 	r.HandleFunc("/{name}", saveBoard).Methods("POST")
+	r.HandleFunc("/{name}/{image}.png", handleImage).Methods("GET")
+	r.HandleFunc("/{name}/{image}.png", saveImage).Methods("POST")
 	r.HandleFunc("/", renderBoard).Methods("GET")
 
 	if config.CertFile == "" || config.KeyFile == "" {
@@ -145,6 +148,35 @@ func saveBoard(w http.ResponseWriter, req *http.Request) {
 		redirect = "/"
 	}
 	http.Redirect(w, req, redirect, http.StatusSeeOther)
+}
+
+func handleImage(w http.ResponseWriter, req *http.Request) {
+	boardName := mux.Vars(req)["name"]
+	imageName := mux.Vars(req)["image"]
+	http.ServeFile(w, req, path.Join("/tmp", boardName+"__"+imageName+".png"))
+}
+
+func saveImage(w http.ResponseWriter, req *http.Request) {
+	boardName := mux.Vars(req)["name"]
+	imageName := mux.Vars(req)["image"]
+	f, err := os.OpenFile(path.Join("/tmp", boardName+"__"+imageName+".png"), os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		log.Printf("save image: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer f.Close()
+
+	n, err := io.Copy(f, req.Body)
+	if err != nil {
+		log.Printf("save image: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if n == 0 {
+		http.Error(w, "no image data", http.StatusBadRequest)
+		return
+	}
 }
 
 var namesCacheMu sync.Mutex

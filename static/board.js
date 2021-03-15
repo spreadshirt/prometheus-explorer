@@ -271,9 +271,14 @@ function createChart(name, config, global) {
   titleNode.textContent = eval("`"+(config.name || name)+"`");
   let linkEl = document.createElement("a");
   linkEl.textContent = "🔗";
+  let imageEl = document.createElement("a");
+  imageEl.textContent = "📄";
+  imageEl.title = "copy permalink to the rendered image";
   titleEl.appendChild(titleNode);
   titleEl.appendChild(document.createTextNode(" "));
   titleEl.appendChild(linkEl);
+  titleEl.appendChild(document.createTextNode(" "));
+  titleEl.appendChild(imageEl);
   chartEl.appendChild(titleEl);
   let canvasEl = document.createElement("canvas");
   canvasEl.width = 800;
@@ -408,6 +413,31 @@ function createChart(name, config, global) {
   };
   config.name = name;
   charts[name] = chart;
+
+  imageEl.addEventListener("click", function(ev) {
+    ev.preventDefault();
+
+    let url = `${location.protocol}//${location.host}${location.pathname}/${name}-${new Date().getTime()}.png`;
+    myChart.canvas.toBlob((blob) => {
+      let req = new Request(url, {method: "POST", body: blob})
+      fetch(req)
+        .then(() => {
+          navigator.clipboard.writeText(url)
+            .then(() => {
+              imageEl.style.boxShadow = "-1px -1px 1px green, 1px 1px 1px green";
+            })
+        })
+        .catch((err) => {
+          imageEl.style.boxShadow = "-1px -1px 1px red, 1px 1px 1px red";
+          console.error(err);
+        })
+        .finally(() => {
+          window.setTimeout(() => {
+            imageEl.style.boxShadow = "";
+          }, 5000);
+        });
+    }, "image/png");
+  });
 
   render(name, config, global);
 
