@@ -574,7 +574,7 @@ async function fetchDataset(config, global) {
 
   let maxSeries = config.max_series || global.defaults.max_series;
   if (resp.data.result.length > maxSeries) {
-    error = `too many metrics, displaying only first ${maxSeries}`;
+    error = `too many metrics, displaying only first ${maxSeries} (of ${resp.data.result.length})`;
   }
 
   for (metric of resp.data.result.slice(0, maxSeries)) {
