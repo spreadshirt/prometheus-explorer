@@ -499,7 +499,8 @@ function createChart(name, config, global) {
         label = eval("`"+label+"`");
       }
       query.query = eval("`"+query.query+"`");
-      datasets.push(fetchDataset({
+      durEl.textContent = "loading...";
+      let res = fetchDataset({
         query: query.query,
         from: config.from,
         to: config.to,
@@ -508,7 +509,8 @@ function createChart(name, config, global) {
         unit: config.unit,
         max_series: config.max_series,
         y_max: config.y_max,
-      }, global));
+      }, global);
+      datasets.push(res);
     }
 
     let chartURL = new URL(`${global.defaults.source}/graph`);
@@ -527,7 +529,11 @@ function createChart(name, config, global) {
       myChart.data.datasets = [];
 
       for (let result of results) {
-        Array.prototype.push.apply(myChart.data.datasets, result);
+        Array.prototype.push.apply(myChart.data.datasets, result.datasets);
+
+        if (result.error) {
+          errEl.textContent = result.error;
+        }
       }
 
       myChart.update();
@@ -563,12 +569,13 @@ async function fetchDataset(config, global) {
       return resp;
     });
 
+  let datasets = [];
+  let error = "";
+
   let maxSeries = config.max_series || global.defaults.max_series;
   if (resp.data.result.length > maxSeries) {
-    throw `too many metrics, displaying only first ${maxSeries}`;
+    error = `too many metrics, displaying only first ${maxSeries}`;
   }
-
-  let datasets = [];
 
   for (metric of resp.data.result.slice(0, maxSeries)) {
     let label = JSON.stringify(metric.metric);
@@ -603,7 +610,10 @@ async function fetchDataset(config, global) {
     });
   }
 
-  return datasets;
+  return {
+    datasets: datasets,
+    error: error,
+  };
 }
 
 // ported from https://github.com/spreadshirt/es-stream-logs/blob/7f320ff3d5d9abb454e69faba041e6a7f107710e/es-stream-logs.py#L201-L216
