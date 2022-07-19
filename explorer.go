@@ -20,7 +20,8 @@ import (
 )
 
 var config struct {
-	Addr string
+	Addr      string
+	BoardsDir string
 
 	CertFile string
 	KeyFile  string
@@ -30,6 +31,7 @@ var boardTmpl *template.Template
 
 func main() {
 	flag.StringVar(&config.Addr, "addr", "localhost:12345", "The address to listen on.")
+	flag.StringVar(&config.BoardsDir, "boards", "./boards", "The directory the boards are stored in.")
 	flag.StringVar(&config.CertFile, "cert-file", "", "The HTTPS certificate to use")
 	flag.StringVar(&config.KeyFile, "key-file", "", "The HTTPS certificate key to use")
 	flag.Parse()
@@ -72,7 +74,7 @@ func renderBoard(w http.ResponseWriter, req *http.Request) {
 
 	isNew := false
 
-	boardFiles, err := os.ReadDir("boards")
+	boardFiles, err := os.ReadDir(config.BoardsDir)
 	if err != nil {
 		log.Printf("listing boards: %s", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -98,12 +100,12 @@ func renderBoard(w http.ResponseWriter, req *http.Request) {
 	boards = append(boards, "default", "shortcuts")
 
 	// FIXME: restrict paths to only boards/
-	data, err := ioutil.ReadFile(path.Join("boards", name+".yml"))
+	data, err := ioutil.ReadFile(path.Join(config.BoardsDir, name+".yml"))
 	if err != nil {
 		log.Printf("opening board %q: %s", name, err)
 
 		isNew = true
-		data, err = ioutil.ReadFile(path.Join("boards", "default.yml"))
+		data, err = ioutil.ReadFile(path.Join(config.BoardsDir, "default.yml"))
 		if err != nil {
 			log.Printf("opening board %q: %s", name, err)
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -111,7 +113,7 @@ func renderBoard(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	shortcutsData, err := ioutil.ReadFile(path.Join("boards", "shortcuts.yml"))
+	shortcutsData, err := ioutil.ReadFile(path.Join(config.BoardsDir, "shortcuts.yml"))
 	if err != nil {
 		log.Printf("opening shortcuts %q: %s", name, err)
 		shortcutsData = []byte{}
@@ -136,7 +138,7 @@ func saveBoard(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err := ioutil.WriteFile(path.Join("boards", boardName+".yml"), []byte(strings.ReplaceAll(boardConfig, "\r\n", "\n")), 0644)
+	err := ioutil.WriteFile(path.Join(config.BoardsDir, boardName+".yml"), []byte(strings.ReplaceAll(boardConfig, "\r\n", "\n")), 0644)
 	if err != nil {
 		log.Printf("could not save board: %s", err)
 		http.Error(w, "error saving board", http.StatusInternalServerError)
